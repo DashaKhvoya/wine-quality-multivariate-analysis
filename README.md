@@ -1,81 +1,61 @@
-# 🍷 Wine Quality Analysis: Exploratory Data Science & Multivariate Statistics
+# 🍷 Wine quality analysis: data science & multivariate statistics
 
-[![Language](https://img.shields.io/badge/Language-R-blue.svg)](https://www.r-project.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Academic Project](https://img.shields.io/badge/TU%20Dresden-Applied%20Statistics-red.svg)](https://tu-dresden.de/)
-
-An applied multivariate statistical analysis of **6,497 wine samples** (1,599 red and 4,898 white variants) of Portuguese *"Vinho Verde"* wine. The study investigates physicochemical properties (acidity, residual sugar, chlorides, sulfur dioxide, pH, sulfates, alcohol) to uncover latent structural differences between wine types and evaluate feature contributions to sensory quality ratings.
+An applied multivariate statistical analysis of **6,497 wine samples** (1,599 red and 4,898 white variants) of wine. The study investigates physicochemical properties (acidity, residual sugar, chlorides, sulfur dioxide, density, pH, sulfates, alcohol) to uncover latent structural differences between wine types and evaluate feature contributions to sensory quality ratings.
 
 ---
 
-## 📌 Key Methodologies
+## Key methodologies
 
-* **Exploratory Data Analysis (EDA) & Normalized Differences**: Quantitative comparison of feature distributions across red and white wines using normalized difference of means:
-  $$\text{Normalized Difference} = \frac{\mu_{\text{white}} - \mu_{\text{red}}}{\text{SD}_{\text{pooled}}}$$
-* **Principal Component Analysis (PCA)**: Unsupervised dimensionality reduction, Scree Plot variance decomposition (selecting components explaining $>85\%$ variance), correlation circles (PC1 vs PC2 loading system), and observation projections.
-* **Factor Analysis (FA)**: Maximum Likelihood factor extraction and Varimax orthogonal rotation to identify underlying latent factors.
-* **Canonical Correlation Analysis (CCA)**: Assessing canonical correlation relationships between chemical compositions and physical characteristics.
-
----
-
-## 📊 Key Visual Insights
-
-### 1. Quality Rating Distribution by Wine Type
-![Quality Share by Type](figures/quality_share_by_type.png)
-
-### 2. Quality Scores Distribution Boxplot (Red vs. White)
-![Quality Boxplot by Type](figures/quality_boxplot_by_type.png)
+* **Exploratory data analysis**: Quantitative comparison of feature distributions across red and white wines using normalized difference of means:
+  $$\Delta = \frac{\mu_{\text{white}} - \mu_{\text{red}}}{\text{SD}_{\text{pooled}}}$$
+* **Principal component analysis (PCA)**: Unsupervised dimensionality reduction, Scree Plot variance decomposition (selecting components explaining $>85\%$ variance), correlation circles (PC1 vs PC2 loading system), and observation projections.
+* **Factor analysis (FA)**: Maximum Likelihood factor extraction and Varimax orthogonal rotation to identify underlying latent factors.
+* **Canonical correlation analysis (CCA)**: Assessing canonical correlation relationships between chemical compositions and physical characteristics.
 
 ---
 
-## 📂 Repository Structure
+## Results & statistical analysis
 
-```text
-wine-quality-multivariate-analysis/
-├── README.md                      # Project documentation and summary
-├── LICENSE                        # MIT License
-├── .gitignore                     # Git ignore rules for R sessions
-│
-├── data/                          # Physicochemical datasets (Cortez et al.)
-│   ├── winequality-red.csv        # Red wine samples (n = 1,599)
-│   └── winequality-white.csv      # White wine samples (n = 4,898)
-│
-├── R/                             # R Source Scripts
-│   ├── 01_data_overview.R         # Data loading, EDA, pooled SD normalization & ggplot2
-│   └── 02_multivariate_pca_fa_cca.R # PCA, Factor Analysis & Canonical Correlation Analysis
-│
-└── figures/                       # Rendered statistical plots & figures
-    ├── quality_share_by_type.png
-    ├── quality_boxplot_by_type.png
-    ├── pca_selection_plots.pdf
-    └── pca_vars_PC1vsPC2.pdf
-```
+### Wine quality distributions
+Both red and white wines share the same median quality score of **6**. However, white wine displays higher variability with a greater proportion of high quality scores ($\ge 6$), whereas red wine contains a higher percentage of lower quality scores ($\le 5$).
+
+![Quality share by type](figures/quality_share_by_type.png)
+
+![Quality boxplot by type](figures/quality_boxplot_by_type.png)
 
 ---
 
-## 🛠️ How to Run
+### Principal component analysis (PCA) & selection
+* **Variance explained:** The first **6 principal components (PCs)** explain approximately **85% of the total variance**, while the 7th PC accounts for less than 5%.
+![PCA selection plot](figures/pca_selection_plots.pdf)
 
-### Prerequisites
-Make sure R and the required R packages are installed:
-```R
-install.packages(c("ggplot2", "scales"))
-```
+* **PC1 (processing & naturalness):** Primarily driven by sulfur dioxides (`total.sulfur.dioxide`, `free.sulfur.dioxide`) and `volatile.acidity`. Free and total $SO_2$ strongly correlate with each other and `residual.sugar`, but negatively correlate with `volatile.acidity`.
+* **PC2 (fullness of taste & strength):** Governed by `density` and `alcohol`, which exhibit a strong inverse relationship.
+![PC1 vs PC2 loading system circle](figures/pca_vars_PC1vsPC2.pdf)
 
-### Execution
-Run the scripts sequentially in R or RStudio:
-```bash
-# 1. Exploratory Data Analysis & Normalization
-Rscript R/01_data_overview.R
+* **Red wines:** Feature a strong alignment of `citric.acid`, `fixed.acidity`, and `pH` along PC1, underscoring their critical role in the red wine flavor profile.
+* **White wines:** Display a distinct `alcohol`-`density`-`residual.sugar` pattern along PC2, reflecting the balance between sweetness and freshness.
+![Red wines PC loadings](figures/pca_red_vars_PC1vsPC2.pdf)
+![White wines PC loadings](figures/pca_white_vars_PC1vsPC2.pdf)
 
-# 2. Multivariate Statistics (PCA, FA, CCA)
-Rscript R/02_multivariate_pca_fa_cca.R
-```
+* **Wine type separation:** The first two principal components clearly separate red and white wines into two distinct clusters along PC1 due to sulfur dioxide and acidity differences.
+* **Quality separation:** In contrast, sensory quality ratings (even when grouped into *bad*, *medium*, and *good* categories) cannot be linearly separated within the PC1–PC2 coordinate space.
+![Observation projection by wine type](figures/pca_observations_by_type_PC1vsPC2.pdf)
+![Observation projection by quality](figures/pca_observations_by_quality_PC1vsPC2.pdf)
 
 ---
 
-## 👤 Author & Acknowledgments
+### Canonical correlation analysis
+Canonical correlation analysis (CCA) was conducted to link production variables $X$ (`fixed.acidity`, `volatile.acidity`, `citric.acid`, `residual.sugar`, `chlorides`, `free.sulfur.dioxide`, `total.sulfur.dioxide`) with physical property variables $Y$ (`density`, `pH`, `sulphates`, `alcohol`).
+
+* **First canonical correlation:** $\rho_1 = 0.9467$
+* **Interpretation:** Uncovers a strong latent dimension bridging production inputs and measured physical properties, where higher acidity and $SO_2$ levels directly correlate with shifts in density, pH, sulphates, and alcohol content.
+![CCA production vs. properties plot](figures/cca_production_vs_properties.pdf)
+
+---
 
 * **Author:** Daria Baranchikova
 * **Institution:** Technische Universität Dresden (TU Dresden)
 * **Course:** Applied Multivariate Statistics
-* **Dataset Source:** UCI Machine Learning Repository / Cortez et al. (2009)
+* **Dataset source:** P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. Modeling wine preferences by data mining
+from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553. ISSN: 0167-9236
