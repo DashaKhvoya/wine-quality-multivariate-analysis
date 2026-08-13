@@ -1,0 +1,10 @@
+# macOS system files
+.DS_Store
+.DS_STORE
+
+# R session history & workspace environment
+.Rhistory
+.RData
+.Rproj.user/
+*.RData
+*.Rhistory
